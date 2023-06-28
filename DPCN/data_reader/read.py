@@ -5,9 +5,10 @@ class Data:
     def __init__(self, train_path, test_path):
 
         data_list = sorted(os.listdir(path=train_path))
-        print(data_list)
+        
         for data in data_list:
-            read_all(train_path + data)
+            read_data = read_all(train_path + data)
+            print(read_data)
 
 
 if __name__ == '__main__':
