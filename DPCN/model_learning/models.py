@@ -1,4 +1,6 @@
 from exr import *
+from diffuse import diff_model
+from spacular import spac_model
 import os
 
 
@@ -10,6 +12,8 @@ if __name__ == '__main__':
 
     data_list = sorted(os.listdir(path=image_path))
 
+    diff_N, diff_AC_L = diff_model()
+    spac_N, spac_AC_L = spac_model()
     # model learning
 
     open('./model_learning/model_version.txt',

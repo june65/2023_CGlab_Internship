@@ -5,6 +5,7 @@ import torch.nn as nn
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+
 def net(conv_L, input_C):
 
     layers = [
@@ -34,30 +35,36 @@ def train(mode='DIFFUSE', dataset='', epochs=40, learning_rate=1e-5):
     dataloader = torch.utils.data.DataLoader(dataset,  batch_size=4,
                                              shuffle=True, num_workers=4)
 
-    diff_Net = net(9, input_C).to(device)
+    Net = net(9, input_C).to(device)
     criterion = nn.L1Loss().cuda()
 
-    diff_Optim = optim.Adam(diff_Net.parameters(), lr=learning_rate)
-    diff_Loss = 0
-    diff_Loss_List = []
+    Optim = optim.Adam(Net.parameters(), lr=learning_rate)
+    Loss = 0
+    Loss_List = []
 
     for epoch in range(epochs):
 
         for _, sample_B in enumerate(dataloader):
 
-            X_diff = sample_B['X_diff'].permute(permutation).to(device)
-            Y_diff = sample_B['Reference'][:, :,
-                                           :, :3].permute(permutation).to(device)
-            diff_Optim.zero_grad()
-            diff_Out = diff_Net(X_diff)
-            Diff_Loss_ = criterion(diff_Out, Y_diff)
-            Diff_Loss_.backward()
-            diff_Optim.step()
+            if mode == 'DIFFUSE':
+                X_diff = sample_B['X_diff'].permute(permutation).to(device)
+                Y_diff = sample_B['Reference'][:, :,
+                                               :, :3].permute(permutation).to(device)
+            elif mode == 'SPACULAR':
+                X_diff = sample_B['X_spec'].permute(permutation).to(device)
+                Y_diff = sample_B['Reference'][:, :,
+                                               :, 3:6].permute(permutation).to(device)
 
-            diff_Loss += Diff_Loss_.item()
+            Optim.zero_grad()
+            Out = Net(X_diff)
+            Loss_ = criterion(Out, Y_diff)
+            Loss_.backward()
+            Optim.step()
+
+            Loss += Loss_.item()
 
         print("Epoch {}".format(epoch + 1))
-        print("LossDiff: {}".format(diff_Loss))
-        diff_Loss = 0
+        print("LossDiff: {}".format(Loss))
+        Loss = 0
 
-    return diff_Net, diff_Loss_List
+    return Net, Loss_List

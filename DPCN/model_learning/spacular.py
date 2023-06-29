@@ -43,7 +43,7 @@ class KPCNDataset(torch.utils.data.Dataset):
         return self.samples[idx]
 
 
-def diff_model():
+def spac_model():
 
     # data reading start
 
@@ -68,7 +68,7 @@ def diff_model():
     kernel_S = 5
     kernel_Width = 21
 
-    diff_N, diff_AC_L = train(
+    spac_N, spac_AC_L = train(
         mode=mode, dataset=dataset, epochs=40, learning_rate=1e-5)
 
-    return diff_N, diff_AC_L
+    return spac_N, spac_AC_L
