@@ -1,2 +1,2 @@
 
-version_1 : diff_LOSS:51.17744875699282% , spac_LOSS:52.220823004841805% , change:1
+version_1 : diff_LOSS:5.051241435110569, spac_LOSS:5.012623779475689, change:1

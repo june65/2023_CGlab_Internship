@@ -25,6 +25,6 @@ if __name__ == '__main__':
                'spacular/DPCN_spac_'+model_version+'.pth')
 
     model_text = open('./model_learning/model_info.txt', 'r').read()
-    model_text = model_text + '\nversion_{} : diff_LOSS:{}% , spac_LOSS:{}% , change:{}'.format(
+    model_text = model_text + '\nversion_{} : diff_LOSS:{}, spac_LOSS:{}, change:{}'.format(
         model_version, diff_AC_L.pop(), spac_AC_L.pop(), model_version)
     open('./model_learning/model_info.txt', 'w').write(model_text)
