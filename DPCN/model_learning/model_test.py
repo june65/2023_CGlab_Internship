@@ -218,11 +218,8 @@ def crop(data, pos, patch_size):
 
 eval_data = preprocess_input(
     "../data/example/10499343-00128spp.exr", "../data/example_GT/10499343-08192spp.exr")
-show_data(eval_data['finalGt'])
 
-eval_data = crop(eval_data, (1280//2, 720//2), 300)
-
-show_data(eval_data['finalGt'])
+# eval_data = crop(eval_data, (1280//2, 720//2), 300)
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -334,15 +331,8 @@ def apply_kernel(weights, data):
 
 def denoise(diffuseNet, specularNet, data, debug=False):
     with torch.no_grad():
-        out_channels = diffuseNet[len(diffuseNet)-1].out_channels
-        mode = 'DPCN' if out_channels == 3 else 'KPCN'
         criterion = nn.L1Loss()
 
-        if debug:
-            print("Out channels:", out_channels)
-            print("Detected mode", mode)
-
-        # make singleton batch
         data = send_to_device(to_torch_tensors(data))
         if len(data['X_diff'].size()) != 4:
             data = unsqueeze_all(data)
@@ -352,36 +342,20 @@ def denoise(diffuseNet, specularNet, data, debug=False):
         X_diff = data['X_diff'].permute(permutation).to(device)
         Y_diff = data['Reference'][:, :, :, :3].permute(permutation).to(device)
 
-        # forward + backward + optimize
         outputDiff = diffuseNet(X_diff)
-
-        # print(outputDiff.shape)
-
-        if mode == 'KPCN':
-            X_input = crop_like(X_diff, outputDiff)
-            outputDiff = apply_kernel(outputDiff, X_input)
-
         Y_diff = crop_like(Y_diff, outputDiff)
 
         lossDiff = criterion(outputDiff, Y_diff).item()
-
-        # get the inputs
         X_spec = data['X_spec'].permute(permutation).to(device)
         Y_spec = data['Reference'][:, :, :, 3:6].permute(
             permutation).to(device)
 
-        # forward + backward + optimize
         outputSpec = specularNet(X_spec)
-
-        if mode == 'KPCN':
-            X_input = crop_like(X_spec, outputSpec)
-            outputSpec = apply_kernel(outputSpec, X_input)
 
         Y_spec = crop_like(Y_spec, outputSpec)
 
         lossSpec = criterion(outputSpec, Y_spec).item()
 
-        # calculate final ground truth error
         albedo = data['origAlbedo'].permute(permutation).to(device)
         albedo = crop_like(albedo, outputDiff)
         outputFinal = outputDiff * (albedo + eps) + torch.exp(outputSpec) - 1.0
@@ -435,12 +409,12 @@ def net(conv_L, input_C):
 
 kdiffuseNet = net(9, 28).to(device)
 kdiffuseNet.load_state_dict(torch.load(
-    './model_learning/model/diffuse/DPCN_diff_1.pth'))
+    './model_learning/model/diffuse/DPCN_diff_2.pth'))
 kdiffuseNet.eval()
 
 kspecularNet = net(9, 28).to(device)
 kspecularNet.load_state_dict(torch.load(
-    './model_learning/model/spacular/DPCN_spac_1.pth'))
+    './model_learning/model/spacular/DPCN_spac_2.pth'))
 kspecularNet.eval()
 
 

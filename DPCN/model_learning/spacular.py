@@ -69,6 +69,6 @@ def spac_model():
     kernel_Width = 21
 
     spac_N, spac_AC_L = train(
-        mode=mode, dataset=dataset, epochs=40, learning_rate=1e-5)
+        mode=mode, dataset=dataset, epochs=100, learning_rate=1e-5)
 
     return spac_N, spac_AC_L

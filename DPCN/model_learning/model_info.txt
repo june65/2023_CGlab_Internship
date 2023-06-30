@@ -1,2 +1,2 @@
-
-version_1 : diff_LOSS:5.051241435110569, spac_LOSS:5.012623779475689, change:1
+version_1 : diff_LOSS:5.051241435110569, spac_LOSS:5.012623779475689, change:epoch 40
+version_2 : diff_LOSS:3.987497206777334, spac_LOSS:4.0166771318763494, change:epoch 100

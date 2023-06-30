@@ -30,7 +30,6 @@ def net(conv_L, input_C):
 
 def train(mode='DIFFUSE', dataset='', epochs=40, learning_rate=1e-5):
     input_C = dataset[0]['X_diff'].shape[-1]
-    print(input_C)
     permutation = [0, 3, 1, 2]
 
     dataloader = torch.utils.data.DataLoader(dataset,  batch_size=4,
