@@ -65,6 +65,7 @@ def train(mode='DIFFUSE', dataset='', epochs=40, learning_rate=1e-5):
 
         print("Epoch {}".format(epoch + 1))
         print("LossDiff: {}".format(Loss))
+        Loss_List.append(Loss)
         Loss = 0
 
     return Net, Loss_List

@@ -1,3 +1,2 @@
 
-version_2 : train_AC:2% , test_AC:2% , change:2
-version_1 : diff_LOSS:[]% , spac_LOSS:[]% , change:1
+version_1 : diff_LOSS:51.17744875699282% , spac_LOSS:52.220823004841805% , change:1
