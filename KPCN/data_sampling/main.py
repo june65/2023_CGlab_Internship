@@ -89,6 +89,12 @@ class Data:
                     sliced_train['specular_GT'] = read_GT['specular'][80 *
                                                                       j:80*(j+1), 80*i:80*(i+1), :]
 
+                    sliced_train['finalInput'] = read_GT['default'][80 *
+                                                                    j:80*(j+1), 80*i:80*(i+1), :]
+
+                    sliced_train['finalGt'] = read_GT['default'][80 *
+                                                                 j:80*(j+1), 80*i:80*(i+1), :]
+
                     X_diff = np.concatenate((sliced_train['diffuse'],
                                              sliced_train['gradDiffuse'],
                                              sliced_train['diffuseVariance'],

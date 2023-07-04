@@ -1,1 +1,1 @@
-version_1 : diff_LOSS:4.22630519233644, spec_LOSS:15.338966198265553, change:epoch 40
+version_1 : diff_LOSS:4.22630519233644, spec_LOSS:15.338966198265553, change:epoch 20
