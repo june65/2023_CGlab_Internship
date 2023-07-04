@@ -49,10 +49,10 @@ def diff_model():
 
     cropped = []
 
-    data_list = sorted(os.listdir(path='../data/sample'))
+    data_list = sorted(os.listdir(path='../data/sample_DPCN'))
 
     for data in data_list:
-        v = torch.load('../data/sample/'+data)
+        v = torch.load('../data/sample_DPCN/'+data)
         cropped.append(v)
 
     cropped = to_torch_tensors(cropped)

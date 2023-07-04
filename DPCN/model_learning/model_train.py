@@ -56,6 +56,7 @@ def train(mode='DIFFUSE', dataset='', epochs=40, learning_rate=1e-5):
                                                :, 3:6].permute(permutation).to(device)
 
             Optim.zero_grad()
+            print(X_diff.shape)
             Out = Net(X_diff)
             Loss_ = criterion(Out, Y_diff)
             Loss_.backward()
