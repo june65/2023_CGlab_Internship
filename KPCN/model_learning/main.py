@@ -27,4 +27,4 @@ if __name__ == '__main__':
     model_text = open('./model_learning/model_info.txt', 'r').read()
     model_text = model_text + '\nversion_{} : diff_LOSS:{}, spec_LOSS:{}, change:{}'.format(
         model_version, diff_AC_loss.pop(), spec_AC_loss.pop(), model_version)
-    open('./model_learning/model_info.txt', 'w').write(model_text)
+    open('./model/model_info.txt', 'w').write(model_text)
