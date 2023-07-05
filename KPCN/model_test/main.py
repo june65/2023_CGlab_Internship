@@ -108,21 +108,13 @@ def crop_like(data, like, debug=False):
 
 def apply_kernel(weights, data):
     recon_kernel_size = 21
-
-    # apply softmax to kernel weights
     weights = weights.permute((0, 2, 3, 1)).to(device)
     _, _, h, w = data.size()
     weights = F.softmax(weights, dim=3).view(-1, w * h,
                                              recon_kernel_size, recon_kernel_size)
 
-    # now we have to apply kernels to every pixel
-    # first pad the input
     r = recon_kernel_size // 2
     data = F.pad(data[:, :3, :, :], (r,) * 4, "reflect")
-
-    # print(data[0,:,:,:])
-
-    # make slices
     R = []
     G = []
     B = []
@@ -137,28 +129,10 @@ def apply_kernel(weights, data):
             R.append(data[:, 0:1, sy:ey, sx:ex])
             G.append(data[:, 1:2, sy:ey, sx:ex])
             B.append(data[:, 2:3, sy:ey, sx:ex])
-            # slices.append(data[:,:,sy:ey,sx:ex])
 
     reds = (torch.cat(R, dim=1).to(device)*weights).sum(2).sum(2)
     greens = (torch.cat(G, dim=1).to(device)*weights).sum(2).sum(2)
     blues = (torch.cat(B, dim=1).to(device)*weights).sum(2).sum(2)
-
-    # pixels = torch.cat(slices, dim=1).to(device)
-    # kerns = torch.cat(kernels, dim=1).to(device)
-
-    # print("Kerns:", kerns.size())
-    # print(kerns[0,:5,:,:])
-    # print("Pixels:", pixels.size())
-    # print(pixels[0,:5,:,:])
-
-    # res = (pixels * kerns).sum(2).sum(2).view(-1, 3, h, w).to(device)
-
-    # tmp = (pixels * kerns).sum(2).sum(2)
-
-    # print(tmp.size(), tmp[0,:10])
-
-    # print("Res:", res.size(), res[0,:5,:,:])
-    # print("Data:", data[0,:5,:,:])
 
     res = torch.cat((reds, greens, blues), dim=1).view(-1, 3, h, w).to(device)
 
@@ -166,7 +140,7 @@ def apply_kernel(weights, data):
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-# BHWC -> BCHW
+
 permutation = [0, 3, 1, 2]
 
 
@@ -301,7 +275,8 @@ if __name__ == '__main__':
         './model/specular/KPCN_spec_3.pth'))
     kspecularNet.eval()
 
-    data_torch = torch.load('../data/sample_KPCN/sample_5_2.pt')
+    data_torch = torch.load(
+        '../data/test_data/test_torch/10560009-00128spp.pt')
     input_list = to_torch_tensors([data_torch])
     input_list = send_to_device(input_list)
 
