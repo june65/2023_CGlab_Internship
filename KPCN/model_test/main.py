@@ -215,15 +215,15 @@ def net(conv_L, input_C):
 if __name__ == '__main__':
     kdiffuseNet = net(9, 29).to(device)
     kdiffuseNet.load_state_dict(torch.load(
-        './model/diffuse/KPCN_diff_1.pth'))
+        './model/diffuse/KPCN_diff_2.pth'))
     kdiffuseNet.eval()
 
     kspecularNet = net(9, 29).to(device)
     kspecularNet.load_state_dict(torch.load(
-        './model/specular/KPCN_spec_1.pth'))
+        './model/specular/KPCN_spec_2.pth'))
     kspecularNet.eval()
 
-    data_torch = torch.load('../data/sample_KPCN/sample_5_9.pt')
+    data_torch = torch.load('../data/sample_KPCN/sample_5_5.pt')
     input_list = to_torch_tensors([data_torch])
     input_list = send_to_device(input_list)
 

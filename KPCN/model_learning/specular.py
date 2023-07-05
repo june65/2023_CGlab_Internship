@@ -128,6 +128,6 @@ def spec_model():
     kernel_Width = 21
 
     spec_N, spec_AC_L = train(
-        mode=mode, dataset=dataset, epochs=20, learning_rate=1e-5)
+        mode=mode, dataset=dataset, epochs=40, learning_rate=1e-5)
 
     return spec_N, spec_AC_L
