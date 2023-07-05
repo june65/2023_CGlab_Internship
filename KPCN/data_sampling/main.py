@@ -80,20 +80,20 @@ class Data:
 
                     for key in read_input.keys():
 
-                        sliced_train[key] = read_input[key][80 *
-                                                            j:80*(j+1), 80*i:80*(i+1), :]
+                        sliced_train[key] = read_input[key][patch_size *
+                                                            j:patch_size*(j+1), patch_size*i:patch_size*(i+1), :]
 
-                    sliced_train['diffuse_GT'] = read_GT['diffuse'][80 *
-                                                                    j:80*(j+1), 80*i:80*(i+1), :]
+                    sliced_train['diffuse_GT'] = read_GT['diffuse'][patch_size *
+                                                                    j:patch_size*(j+1), patch_size*i:patch_size*(i+1), :]
 
-                    sliced_train['specular_GT'] = read_GT['specular'][80 *
-                                                                      j:80*(j+1), 80*i:80*(i+1), :]
+                    sliced_train['specular_GT'] = read_GT['specular'][patch_size *
+                                                                      j:patch_size*(j+1), patch_size*i:patch_size*(i+1), :]
 
-                    sliced_train['finalInput'] = read_GT['default'][80 *
-                                                                    j:80*(j+1), 80*i:80*(i+1), :]
+                    sliced_train['finalInput'] = read_GT['default'][patch_size *
+                                                                    j:patch_size*(j+1), patch_size*i:patch_size*(i+1), :]
 
-                    sliced_train['finalGt'] = read_GT['default'][80 *
-                                                                 j:80*(j+1), 80*i:80*(i+1), :]
+                    sliced_train['finalGt'] = read_GT['default'][patch_size *
+                                                                 j:patch_size*(j+1), patch_size*i:patch_size*(i+1), :]
 
                     X_diff = np.concatenate((sliced_train['diffuse'],
                                              sliced_train['gradDiffuse'],

@@ -36,6 +36,78 @@ def send_to_device(data):
 # model training start
 
 
+def apply_kernel(weights, data):
+    recon_kernel_size = 21
+
+    # apply softmax to kernel weights
+    weights = weights.permute((0, 2, 3, 1)).to(device)
+    _, _, h, w = data.size()
+    weights = F.softmax(weights, dim=3).view(-1, w * h,
+                                             recon_kernel_size, recon_kernel_size)
+
+    # now we have to apply kernels to every pixel
+    # first pad the input
+    r = recon_kernel_size // 2
+    data = F.pad(data[:, :3, :, :], (r,) * 4, "reflect")
+
+    # print(data[0,:,:,:])
+
+    # make slices
+    R = []
+    G = []
+    B = []
+    kernels = []
+    for i in range(h):
+        for j in range(w):
+            pos = i*h+j
+            ws = weights[:, pos:pos+1, :, :]
+            kernels += [ws, ws, ws]
+            sy, ey = i+r-r, i+r+r+1
+            sx, ex = j+r-r, j+r+r+1
+            R.append(data[:, 0:1, sy:ey, sx:ex])
+            G.append(data[:, 1:2, sy:ey, sx:ex])
+            B.append(data[:, 2:3, sy:ey, sx:ex])
+            # slices.append(data[:,:,sy:ey,sx:ex])
+
+    reds = (torch.cat(R, dim=1).to(device)*weights).sum(2).sum(2)
+    greens = (torch.cat(G, dim=1).to(device)*weights).sum(2).sum(2)
+    blues = (torch.cat(B, dim=1).to(device)*weights).sum(2).sum(2)
+
+    # pixels = torch.cat(slices, dim=1).to(device)
+    # kerns = torch.cat(kernels, dim=1).to(device)
+
+    # print("Kerns:", kerns.size())
+    # print(kerns[0,:5,:,:])
+    # print("Pixels:", pixels.size())
+    # print(pixels[0,:5,:,:])
+
+    # res = (pixels * kerns).sum(2).sum(2).view(-1, 3, h, w).to(device)
+
+    # tmp = (pixels * kerns).sum(2).sum(2)
+
+    # print(tmp.size(), tmp[0,:10])
+
+    # print("Res:", res.size(), res[0,:5,:,:])
+    # print("Data:", data[0,:5,:,:])
+
+    res = torch.cat((reds, greens, blues), dim=1).view(-1, 3, h, w).to(device)
+
+    return res
+
+
+def crop_like(data, like, debug=False):
+    if data.shape[-2:] != like.shape[-2:]:
+        # crop
+        with torch.no_grad():
+            dx, dy = data.shape[-2] - \
+                like.shape[-2], data.shape[-1] - like.shape[-1]
+            data = data[:, :, dx//2:-dx//2, dy//2:-dy//2]
+            if debug:
+                print(dx, dy)
+                print("After crop:", data.shape)
+    return data
+
+
 def net(conv_L, input_C):
 
     layers = [
@@ -48,7 +120,7 @@ def net(conv_L, input_C):
             nn.ReLU()
         ]
 
-    layers += [nn.Conv2d(100, 3,  kernel_size=5, padding=2, stride=1)]
+    layers += [nn.Conv2d(100, 21*21,  kernel_size=5, padding=2, stride=1)]
 
     for layer in layers:
         if isinstance(layer, nn.Conv2d):
@@ -76,9 +148,15 @@ def train(mode='DIFFUSE', dataset='', epochs=40, learning_rate=1e-5):
             X_spec = sample_B['X_spec'].permute(permutation).to(device)
             Y_spec = sample_B['specular_GT'].permute(permutation).to(device)
 
+            if mode == 'KPCN':
+                outputspec = Spec_Net(X_spec)
+                X_input = crop_like(X_spec, outputspec)
+                outputspec = apply_kernel(outputspec, X_input)
+                Y_spec = crop_like(Y_spec, outputspec)
+
             spec_Optim.zero_grad()
-            spec_Out = Spec_Net(X_spec)
-            Spec_Loss_ = criterion(spec_Out, Y_spec)
+            # spec_Out = Spec_Net(X_spec)
+            Spec_Loss_ = criterion(outputspec, Y_spec)
             Spec_Loss_.backward()
             spec_Optim.step()
 
@@ -121,7 +199,7 @@ def spec_model():
     dataset = KPCNDataset(input_list)
 
     # data reading end
-    mode = 'SPECULAR'
+    mode = 'KPCN'
     conv_L = 9
     hidden_C = 100
     kernel_S = 5
