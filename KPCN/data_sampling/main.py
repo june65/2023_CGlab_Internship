@@ -89,7 +89,7 @@ class Data:
                     sliced_train['specular_GT'] = read_GT['specular'][patch_size *
                                                                       j:patch_size*(j+1), patch_size*i:patch_size*(i+1), :]
 
-                    sliced_train['finalInput'] = read_GT['default'][patch_size *
+                    sliced_train['finalInput'] = read_input['default'][patch_size *
                                                                     j:patch_size*(j+1), patch_size*i:patch_size*(i+1), :]
 
                     sliced_train['finalGt'] = read_GT['default'][patch_size *

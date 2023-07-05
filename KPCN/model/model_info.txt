@@ -1,2 +1,3 @@
 version_1 : diff_LOSS:4.22630519233644, spec_LOSS:15.338966198265553, change:epoch 20
 version_2 : diff_LOSS:2.943768508732319, spec_LOSS:9.217498703859746, change:epoch 40
+version_3 : diff_LOSS:3.982066188007593, spec_LOSS:42.29027634335216, change:epoch 20 kernel use
