@@ -61,7 +61,7 @@ def preprocess_specular(specular):
 
 
 def postprocess_specular(specular):
-    return np.exp(specular) - 1
+    return np.exp(specular - 1e-6) - 1
 
 
 def preprocess_diff_var(variance, albedo):
@@ -276,7 +276,7 @@ if __name__ == '__main__':
     kspecularNet.eval()
 
     data_torch = torch.load(
-        '../data/test_data/test_torch/10560009-00128spp.pt')
+        '../data/test_data/test_torch/97796127-00128spp.pt')
     input_list = to_torch_tensors([data_torch])
     input_list = send_to_device(input_list)
 

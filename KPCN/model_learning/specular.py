@@ -165,6 +165,8 @@ def train(mode='DIFFUSE', dataset='', epochs=40, learning_rate=1e-5):
 
         print("Epoch {}".format(epoch + 1))
         print("Lossspec: {}".format(Spec_Loss))
+        Spec_Loss_List.append(Spec_Loss)
+
         Spec_Loss = 0
 
     return Spec_Net, Spec_Loss_List

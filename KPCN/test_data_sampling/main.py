@@ -11,8 +11,8 @@ def preprocess_diffuse(diffuse, albedo):
 
 
 def preprocess_specular(specular):
-
-    return np.log(specular + 1)
+    specular = np.where(specular < 0, 0, specular)
+    return np.log(specular + 1) + 1e-6
 
 
 def preprocess_diff_var(variance, albedo):
@@ -21,6 +21,24 @@ def preprocess_diff_var(variance, albedo):
 
 def preprocess_spec_var(variance, specular):
     return variance / (specular+1e-5)**2
+
+
+def preprocess_albe_var(variance):
+    variance = np.where(np.isnan(variance) | (
+        variance == -np.nan), 0, variance)
+    return variance
+
+
+def preprocess_depth_var(variance):
+    variance = np.where(np.isnan(variance) | (
+        variance == -np.nan), 0, variance)
+    return variance
+
+
+def preprocess_norm_var(variance):
+    variance = np.where(np.isnan(variance) | (
+        variance == -np.nan), 0, variance)
+    return variance
 
 
 def gradients(data):
@@ -55,6 +73,15 @@ class Data:
 
             read_input['specularVariance'] = preprocess_spec_var(
                 read_input['specularVariance'], read_input['specular'])
+
+            read_input['albedoVariance'] = preprocess_albe_var(
+                read_input['albedoVariance'])
+
+            read_input['depthVariance'] = preprocess_depth_var(
+                read_input['depthVariance'])
+
+            read_input['normalVariance'] = preprocess_norm_var(
+                read_input['normalVariance'])
 
             read_input['gradAlbedo'] = gradients(
                 read_input['albedo'][:, :, :3].copy())

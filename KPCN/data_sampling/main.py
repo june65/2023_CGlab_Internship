@@ -11,7 +11,8 @@ def preprocess_diffuse(diffuse, albedo):
 
 
 def preprocess_specular(specular):
-    return np.log(specular + 1)
+    specular = np.where(specular < 0, 0, specular)
+    return np.log(specular + 1) + 1e-6
 
 
 def preprocess_diff_var(variance, albedo):
@@ -20,6 +21,29 @@ def preprocess_diff_var(variance, albedo):
 
 def preprocess_spec_var(variance, specular):
     return variance / (specular+1e-5)**2
+
+
+def preprocess_albe_var(variance):
+    variance = np.where(np.isnan(variance) | (
+        variance == -np.nan), 0, variance)
+    return variance
+
+
+def preprocess_norm_var(variance):
+    variance = np.where(np.isnan(variance) | (
+        variance == -np.nan), 0, variance)
+    return variance
+
+
+def preprocess_depth_var(variance):
+    variance = np.where(np.isnan(variance) | (
+        variance == -np.nan), 0, variance)
+    return variance
+
+
+def preprocess_specular(specular):
+    specular = np.where(specular < 0, 0, specular)
+    return np.log(specular + 1)
 
 
 def gradients(data):
@@ -51,11 +75,26 @@ class Data:
             read_input['specular'] = preprocess_specular(
                 read_input['specular'])
 
+            read_GT['diffuse'] = preprocess_diffuse(
+                read_GT['diffuse'], read_GT['albedo'])
+
+            read_GT['specular'] = preprocess_specular(
+                read_GT['specular'])
+
             read_input['diffuseVariance'] = preprocess_diff_var(
                 read_input['diffuseVariance'], read_input['albedo'])
 
             read_input['specularVariance'] = preprocess_spec_var(
                 read_input['specularVariance'], read_input['specular'])
+
+            read_input['albedoVariance'] = preprocess_albe_var(
+                read_input['albedoVariance'])
+
+            read_input['depthVariance'] = preprocess_depth_var(
+                read_input['depthVariance'])
+
+            read_input['normalVariance'] = preprocess_norm_var(
+                read_input['normalVariance'])
 
             read_input['gradAlbedo'] = gradients(
                 read_input['albedo'][:, :, :3].copy())
@@ -90,7 +129,7 @@ class Data:
                                                                       j:patch_size*(j+1), patch_size*i:patch_size*(i+1), :]
 
                     sliced_train['finalInput'] = read_input['default'][patch_size *
-                                                                    j:patch_size*(j+1), patch_size*i:patch_size*(i+1), :]
+                                                                       j:patch_size*(j+1), patch_size*i:patch_size*(i+1), :]
 
                     sliced_train['finalGt'] = read_GT['default'][patch_size *
                                                                  j:patch_size*(j+1), patch_size*i:patch_size*(i+1), :]
@@ -121,7 +160,7 @@ class Data:
                     sliced_train['X_spec'] = X_spec
 
                     torch.save(
-                        sliced_train, '../data/sample_KPCN/sample_'+str(j+1)+'_'+str(i+1)+'.pt')
+                        sliced_train, '../data/sample_KPCN/'+data.replace('.exr', '')+'_'+str(j+1)+'_'+str(i+1)+'.pt')
 
 
 if __name__ == '__main__':

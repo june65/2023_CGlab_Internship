@@ -167,6 +167,8 @@ def train(mode='KPCN', dataset='', epochs=40, learning_rate=1e-5):
         print("LossDiff: {}".format(diff_Loss))
         diff_Loss = 0
 
+    
+
     return diff_Net, diff_Loss_List
 
 # model training end
