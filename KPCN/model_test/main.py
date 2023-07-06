@@ -276,7 +276,7 @@ if __name__ == '__main__':
     kspecularNet.eval()
 
     data_torch = torch.load(
-        '../data/test_data/test_torch/97796127-00128spp.pt')
+        '../data/test_data/test_torch/98765255-00128spp.pt')
     input_list = to_torch_tensors([data_torch])
     input_list = send_to_device(input_list)
 
