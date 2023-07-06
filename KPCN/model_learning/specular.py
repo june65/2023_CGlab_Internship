@@ -130,18 +130,24 @@ def net(conv_L, input_C):
     return nn.Sequential(*layers)
 
 
-def train(mode='DIFFUSE', dataset='', epochs=40, learning_rate=1e-5):
+def train(mode='DIFFUSE', dataset='', val_dataset='', epochs=40, learning_rate=1e-5):
 
     input_C = dataset[0]['X_spec'].shape[-1]
     dataloader = torch.utils.data.DataLoader(dataset,  batch_size=4,
                                              shuffle=True, num_workers=4)
+
+    val_dataloader = torch.utils.data.DataLoader(val_dataset,  batch_size=4,
+                                                 shuffle=True, num_workers=4)
+
     permutation = [0, 3, 1, 2]
     Spec_Net = net(9, input_C).to(device)
     criterion = nn.L1Loss().cuda()
 
     spec_Optim = optim.Adam(Spec_Net.parameters(), lr=learning_rate)
-    Spec_Loss = 0
-    Spec_Loss_List = []
+    train_Spec_Loss = 0
+    val_Spec_Loss = 0
+    train_Spec_Loss_List = []
+    val_Spec_Loss_List = []
 
     for epoch in range(epochs):
 
@@ -161,15 +167,41 @@ def train(mode='DIFFUSE', dataset='', epochs=40, learning_rate=1e-5):
             Spec_Loss_.backward()
             spec_Optim.step()
 
-            Spec_Loss += Spec_Loss_.item()
+            train_Spec_Loss += Spec_Loss_.item()
+
+        for _, sample_A in enumerate(val_dataloader):
+
+            X_spec = sample_A['X_spec'].permute(permutation).to(device)
+            Y_spec = sample_A['specular_GT'].permute(permutation).to(device)
+
+            if mode == 'KPCN':
+                outputspec = Spec_Net(X_spec)
+                X_input = crop_like(X_spec, outputspec)
+                outputspec = apply_kernel(outputspec, X_input)
+                Y_spec = crop_like(Y_spec, outputspec)
+
+            spec_Optim.zero_grad()
+            # spec_Out = Spec_Net(X_spec)
+            Spec_Loss_ = criterion(outputspec, Y_spec)
+            Spec_Loss_.backward()
+            spec_Optim.step()
+
+            val_Spec_Loss += Spec_Loss_.item()
+
+        train_Spec_Loss = train_Spec_Loss/len(dataloader)
+        val_Spec_Loss = val_Spec_Loss/len(val_dataloader)
 
         print("Epoch {}".format(epoch + 1))
-        print("Lossspec: {}".format(Spec_Loss))
-        Spec_Loss_List.append(Spec_Loss)
+        print("train_Lossspec: {}".format(train_Spec_Loss))
+        print("val_Lossspec: {}".format(val_Spec_Loss))
 
-        Spec_Loss = 0
+        train_Spec_Loss_List.append(train_Spec_Loss)
+        val_Spec_Loss_List.append(val_Spec_Loss)
 
-    return Spec_Net, Spec_Loss_List
+        train_Spec_Loss = 0
+        val_Spec_Loss = 0
+
+    return Spec_Net, train_Spec_Loss_List, val_Spec_Loss_List
 
 # model training end
 
@@ -185,7 +217,18 @@ class KPCNDataset(torch.utils.data.Dataset):
         return self.inputs[idx]
 
 
-def spec_model():
+class KPCN_val_Dataset(torch.utils.data.Dataset):
+    def __init__(self, samples):
+        self.inputs = samples
+
+    def __len__(self):
+        return len(self.inputs)
+
+    def __getitem__(self, idx):
+        return self.inputs[idx]
+
+
+def spec_model(epochs):
 
     # data reading start
     input_list = []
@@ -202,13 +245,29 @@ def spec_model():
     dataset = KPCNDataset(input_list)
 
     # data reading end
+
+    # data reading start
+    val_list = []
+
+    val_data_list = sorted(os.listdir(path='../data/sample_KPCN2/KPCN_val'))
+
+    for val_data in val_data_list:
+        val_data_torch = torch.load(
+            '../data/sample_KPCN2/KPCN_val/' + val_data)
+        val_list.append(val_data_torch)
+
+    val_list = to_torch_tensors(val_list)
+    val_list = send_to_device(val_list)
+
+    val_dataset = KPCN_val_Dataset(val_list)
+
     mode = 'KPCN'
     conv_L = 9
     hidden_C = 100
     kernel_S = 5
     kernel_Width = 21
 
-    spec_N, spec_AC_L = train(
-        mode=mode, dataset=dataset, epochs=40, learning_rate=1e-5)
+    spec_N, spec_AC_L, val_spec_AC_L = train(
+        mode=mode, dataset=dataset, val_dataset=val_dataset, epochs=epochs, learning_rate=1e-5)
 
-    return spec_N, spec_AC_L
+    return spec_N, spec_AC_L, val_spec_AC_L
