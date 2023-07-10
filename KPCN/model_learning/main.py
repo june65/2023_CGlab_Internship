@@ -30,11 +30,8 @@ def draw_result(epochs, diff_AC_loss, val_diff_AC_loss, spec_AC_loss, val_spec_A
 
 if __name__ == '__main__':
 
-    image_path = '../data/example/'
     model_path = './model/'
     model_version = open('./model/model_version.txt', 'r').read()
-
-    data_list = sorted(os.listdir(path=image_path))
 
     epochs = 40
 

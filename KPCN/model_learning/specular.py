@@ -233,10 +233,10 @@ def spec_model(epochs):
     # data reading start
     input_list = []
 
-    data_list = sorted(os.listdir(path='../data/sample_KPCN'))
+    data_list = sorted(os.listdir(path='D:/Dataset/sample_KPCN'))
 
     for data in data_list:
-        data_torch = torch.load('../data/sample_KPCN/'+data)
+        data_torch = torch.load('D:/Dataset/sample_KPCN/'+data)
         input_list.append(data_torch)
 
     input_list = to_torch_tensors(input_list)
@@ -249,11 +249,11 @@ def spec_model(epochs):
     # data reading start
     val_list = []
 
-    val_data_list = sorted(os.listdir(path='../data/sample_KPCN2/KPCN_val'))
+    val_data_list = sorted(os.listdir(path='D:/Dataset/sample_KPCN2/KPCN_val'))
 
     for val_data in val_data_list:
         val_data_torch = torch.load(
-            '../data/sample_KPCN2/KPCN_val/' + val_data)
+            'D:/Dataset/sample_KPCN2/KPCN_val/' + val_data)
         val_list.append(val_data_torch)
 
     val_list = to_torch_tensors(val_list)
