@@ -5,6 +5,7 @@ import torch.nn.functional as F
 import torch.nn as nn
 import os
 import numpy as np
+from specular import *
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -226,7 +227,7 @@ class KPCN_val_Dataset(torch.utils.data.Dataset):
 
 
 def diff_model(epochs):
-
+    print('start diff train data load')
     # data reading start
     input_list = []
 
@@ -235,14 +236,15 @@ def diff_model(epochs):
     for data in data_list:
         data_torch = torch.load('D:/Dataset/sample_KPCN2/KPCN_train/'+data)
         input_list.append(data_torch)
-
+        print(data)
+    
     input_list = to_torch_tensors(input_list)
     input_list = send_to_device(input_list)
 
     dataset = KPCNDataset(input_list)
 
     # data reading end
-
+    print('start diff val data load')
     # data reading start
     val_list = []
 
@@ -252,6 +254,7 @@ def diff_model(epochs):
         val_data_torch = torch.load(
             'D:/Dataset/sample_KPCN2/KPCN_val/' + val_data)
         val_list.append(val_data_torch)
+        print(val_data)
 
     val_list = to_torch_tensors(val_list)
     val_list = send_to_device(val_list)
@@ -264,7 +267,12 @@ def diff_model(epochs):
     kernel_S = 5
     kernel_Width = 21
 
+    print('start train')
+    
+    spec_N, spec_AC_L, val_spec_AC_L = train_spec(
+        mode=mode, dataset=dataset, val_dataset=val_dataset, epochs=epochs, learning_rate=1e-5)
     diff_N, diff_AC_L, val_diff_AC_L = train(
         mode=mode, dataset=dataset, val_dataset=val_dataset, epochs=epochs, learning_rate=1e-5)
+    
 
-    return diff_N, diff_AC_L, val_diff_AC_L
+    return diff_N, diff_AC_L, val_diff_AC_L, spec_N, spec_AC_L, val_spec_AC_L
