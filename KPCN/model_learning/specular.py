@@ -130,7 +130,7 @@ def net(conv_L, input_C):
     return nn.Sequential(*layers)
 
 
-def train_spec(mode='DIFFUSE', dataset='', val_dataset='', epochs=40, learning_rate=1e-5):
+def train(mode='DIFFUSE', dataset='', val_dataset='', epochs=40, learning_rate=1e-5):
 
     input_C = dataset[0]['X_spec'].shape[-1]
     dataloader = torch.utils.data.DataLoader(dataset,  batch_size=4,

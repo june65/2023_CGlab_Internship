@@ -267,16 +267,16 @@ def net(conv_L, input_C, mode):
 if __name__ == '__main__':
     kdiffuseNet = net(9, 29, 'KPCN').to(device)
     kdiffuseNet.load_state_dict(torch.load(
-        './model/diffuse/KPCN_diff_5.pth'))
+        './model/diffuse/KPCN_diff_6.pth'))
     kdiffuseNet.eval()
 
     kspecularNet = net(9, 29, 'KPCN').to(device)
     kspecularNet.load_state_dict(torch.load(
-        './model/specular/KPCN_spec_5.pth'))
+        './model/specular/KPCN_spec_6.pth'))
     kspecularNet.eval()
 
     data_torch = torch.load(
-        '../data/test_data/test_torch/98765255-00128spp.pt')
+        '../data/test_data/test_torch/97483481-00128spp.pt')
     input_list = to_torch_tensors([data_torch])
     input_list = send_to_device(input_list)
 

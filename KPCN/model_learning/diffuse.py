@@ -5,7 +5,6 @@ import torch.nn.functional as F
 import torch.nn as nn
 import os
 import numpy as np
-from specular import *
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -268,11 +267,8 @@ def diff_model(epochs):
     kernel_Width = 21
 
     print('start train')
-    
-    spec_N, spec_AC_L, val_spec_AC_L = train_spec(
-        mode=mode, dataset=dataset, val_dataset=val_dataset, epochs=epochs, learning_rate=1e-5)
+
     diff_N, diff_AC_L, val_diff_AC_L = train(
         mode=mode, dataset=dataset, val_dataset=val_dataset, epochs=epochs, learning_rate=1e-5)
-    
 
-    return diff_N, diff_AC_L, val_diff_AC_L, spec_N, spec_AC_L, val_spec_AC_L
+    return diff_N, diff_AC_L, val_diff_AC_L

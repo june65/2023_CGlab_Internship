@@ -33,9 +33,10 @@ if __name__ == '__main__':
     model_path = './model/'
     model_version = open('./model/model_version.txt', 'r').read()
 
-    epochs = 40
+    epochs = 100
     
-    diff_net, diff_AC_loss, val_diff_AC_loss, spec_net, spec_AC_loss, val_spec_AC_loss = diff_model(epochs)
+    spec_net, spec_AC_loss, val_spec_AC_loss = spec_model(epochs)
+    diff_net, diff_AC_loss, val_diff_AC_loss = diff_model(epochs)
     
 
     open('./model/model_version.txt',
